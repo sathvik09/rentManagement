@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+     <link rel="stylesheet" href="./css/page1.css">
+</head>
+<body>
+    <div class="nav">
+        <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>Drop Me!</a>
+
+  <!-- Dropdown Structure -->
+  <ul id='dropdown1' class='dropdown-content'>
+  </ul>
+    </div>
+    <div class="table">
+        <table class="table_t">
+          <tr> 
+            <th>Name</th>"
+            <th>Bank</th>
+            <th>Deposit</th>
+            <th>lease from</th>
+            <th>lease to</th>
+            <th>krp</th>
+            <th>vis</th>
+            <th>cleaning</th>
+            <th>Total/month</th>
+        </tr>    
+        </table>
+    </div>
+    <div class="months">
+      <h3 class='outstanding'>Total outstanding = </h3>
+        <div class="contain-card">
+
+        </div>
+    </div>
+            <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+<script src="./js/firebase.js"></script>
+<script src="./js/material.js"></script>
+<script>
+    let dropdown = document.querySelector('.dropdown-content');
+    let arr = [];
+        window.addEventListener('load',()=>{
+        var starCountRef = firebase.database().ref('User/');
+ starCountRef.on('value',function(snapshot) {
+    Object.entries(snapshot.val()).forEach(([key, value]) =>{
+        arr.push(value)
+    })
+
+    arr.forEach((entry,i)=>{
+        dropdown.innerHTML+=`<li id=${i} class=cls>${entry.name}</li>`
+       })
+     let x = document.querySelectorAll('.cls');
+     let months = document.querySelector('.contain-card');
+     let table = document.querySelector('.table_t');
+     const monthTable = [
+       'January',
+       'Febuary',
+       'March',
+       'April',
+       'May',
+       'June',
+       'July',
+       'Augest',
+       'September',
+       'October',
+       'November',
+       'December'
+    ];
+     x.forEach((e,index)=>{
+         e.addEventListener('click',()=>{
+           let outstand = document.querySelector('.outstanding');
+           let amt=0;
+           let date = new Date();
+             console.log(arr[e.id].payment);
+             let total = parseFloat(arr[e.id].krp)+parseFloat(arr[e.id].vis)+parseFloat(arr[e.id].cleaning);
+             for(let j=0;j<date.getMonth()+1;j++){
+             if(!arr[e.id].payment[j][0]){
+               amt+=total;
+             }
+           }
+           console.log(amt);
+           outstand.innerHTML+=`${amt}`;
+             table.innerHTML = `
+             <tr> 
+                <th>Name</th>"
+                <th>Bank</th>
+                <th>Deposit</th>
+                <th>lease from</th>
+                <th>lease to</th>
+                <th>krp</th>
+                <th>vis</th>
+                <th>cleaning</th>
+                <th>Total/month</th>
+            </tr>
+             <tr>
+              <td>${arr[e.id].name}</td>   
+              <td>${arr[e.id].bank}</td>   
+              <td>${arr[e.id].deposit}</td>   
+              <td>${arr[e.id].date[0]}</td>   
+              <td>${arr[e.id].date[1]}</td>   
+              <td>${arr[e.id].krp}</td>   
+              <td>${arr[e.id].vis}</td>   
+              <td>${arr[e.id].cleaning}</td>   
+              <td>${total}</td>   
+             </tr>
+             `;
+             console.log(arr[e.id]);
+         for(let i=0;i<date.getMonth()+1;i++){
+           let date_db;
+              if(!arr[e.id].payment[i][0]){
+              total = parseFloat(arr[e.id].krp)+parseFloat(arr[e.id].vis)+parseFloat(arr[e.id].cleaning);
+              date_db="not paid";
+             }
+             else{
+               total = 0;
+               date_db = arr[e.id].payment[i][1];
+
+             }
+                months.innerHTML+= `
+             
+             <div class="row">
+    <div class="col s12 m7">
+      <div class="card">
+        <div class="card-image">
+          <img src="images/bg-01.jpg">
+          <span class="card-title">${monthTable[i]}</span>
+        </div>
+        <div class="card-content">
+          <p>KRP</p><input type='text' />  
+          <p>VIS</p><input type='text' />  
+          <p>Paid on:</p><input value=${date_db} type='text' />  
+          <h3>DUE: <input type="button" id=${i+15} class='pay-val' value=${total} /></h3> 
+        <div class="card-action">
+            <button class="btn waves-effect waves-light submit-pay" type="submit" name="action">Paid
+  </button>
+        </div>
+      </div>
+    </div>
+  </div>
+             `;
+             }
+
+             let pay_btn = document.querySelectorAll('.submit-pay');
+             pay_btn.forEach((x,i)=>{
+               x.addEventListener('click',()=>{
+                 const data = arr[e.id];
+                 if(total>0){
+                  data.payment[i][0] = true;
+                data.payment[i].push(new Date());
+                 console.log(data);
+                database.ref('User/'+data.id).update(data)
+                document.getElementById(`${i+15}`).value = 0;
+                outstand.innerHTML=`Outstanting amt = ${amt-total}`;
+                 }
+               })
+             })
+         })
+     })
+    });
+})
+console.log(arr);
+  //  console.log(arr);
+</script>
+</body>
+</html>

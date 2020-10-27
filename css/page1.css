@@ -1,0 +1,35 @@
+html,body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.nav{
+    height: 10vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.table{
+    height: 15vh;
+    width: 90%;
+    margin: auto;
+    border: 1px solid black;
+}
+.table tr,th{
+    font-size: 25px;
+}
+
+.contain-card{
+    width: 80%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 200px 200px;
+    justify-content: space-around;
+    height: 75vh;
+}
+.contain-card .row{
+    width: 600px;
+
+}
