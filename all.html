@@ -15,9 +15,13 @@
 <body>
     <div class="nav">
         <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>Drop Me!</a>
+        <a class='dropdown-trigger1 btn' href='#' data-target='dropdown2'>Years</a>
 
   <!-- Dropdown Structure -->
-  <ul id='dropdown1' class='dropdown-content'>
+  <ul id='dropdown1' class='dropdown-content dropdown1'>
+  </ul>
+
+  <ul id='dropdown2' class='dropdown-content dropdown2'>
   </ul>
     </div>
     <div class="table">
@@ -51,8 +55,17 @@
 <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
 <script src="./js/firebase.js"></script>
 <script src="./js/material.js"></script>
+<script src="./js/auth.js"></script>
 <script>
-    let dropdown = document.querySelector('.dropdown-content');
+  auth.onAuthStateChanged(user=>{
+		if(!user){
+			window.location.assign("./index.html");
+		}
+	})
+</script>
+<script>
+    let dropdown = document.querySelector('.dropdown1');
+    let dropdown2 = document.querySelector('.dropdown2');
     let arr = [];
         window.addEventListener('load',()=>{
         var starCountRef = firebase.database().ref('User/');
@@ -67,7 +80,11 @@
      let x = document.querySelectorAll('.cls');
      let months = document.querySelector('.contain-card');
      let table = document.querySelector('.table_t');
-     const monthTable = [
+
+     // for years
+
+
+           const monthTable = [
        'January',
        'Febuary',
        'March',
@@ -81,20 +98,78 @@
        'November',
        'December'
     ];
-     x.forEach((e,index)=>{
-         e.addEventListener('click',()=>{
+
+
+           //get all the years class and put an even listener to access
+
+           //const years_list = document.querySelectorAll('.years_list');
            let outstand = document.querySelector('.outstanding');
+
+            x.forEach((e,index)=>{
+         e.addEventListener('click',()=>{
+
+          const start_date = new Date(arr[index].date[0]);
+           let end_date = new Date(arr[index].date[1]);
+           let current_date = new Date();
+           let year_list_arr = [];
+
+           for(let i=start_date.getFullYear();i<=end_date.getFullYear();i++){
+            dropdown2.innerHTML += `
+           <li id=${Math.random()*100} class='years_list'>year ${i}</li>
+           `;
+           year_list_arr.push(i);
+           }
+
            let amt=0;
            let date = new Date();
-             console.log(arr[e.id].payment);
-             let total = parseFloat(arr[e.id].krp)+parseFloat(arr[e.id].vis)+parseFloat(arr[e.id].cleaning);
-             for(let j=0;j<date.getMonth()+1;j++){
-             if(!arr[e.id].payment[j][0]){
+           const year_nodeList = document.querySelectorAll('.years_list');
+           console.log(year_nodeList);
+           year_nodeList.forEach((year,year_index)=>{
+             year.addEventListener('click',()=>{
+               console.log(year.value);
+              months.innerHTML='';
+               // checking if the curr year is the start year or the end year
+          let st_range=0;
+          let end_range=0;
+
+          // console.log(year_list_arr);
+          // console.log(end_date.getFullYear());
+          if(current_date.getFullYear()<end_date.getFullYear()){
+            end_date = current_date;
+          }
+
+          if(year_list_arr[year_index]===start_date.getFullYear() && year_list_arr[year_index]<end_date.getFullYear()){
+            st_range = start_date.getMonth()+1;
+            end_range = 12;
+          }
+          else if(year_list_arr[year_index]===end_date.getFullYear() && year_list_arr[year_index]>start_date.getFullYear()){
+            if(current_date.getMonth()<end_date.getMonth()){
+              end_range = current_date.getMonth();
+            }
+            else{
+              end_range = end_date.getMonth();
+            }
+          }
+          else if(start_date.getFullYear() === end_date.getFullYear()){
+            st_range = start_date.getMonth()+1;
+            end_range = end_date.getMonth()+1;
+          }
+          else{
+            st_range=0;
+            end_range=12;
+          }  
+
+            let total = parseFloat(arr[e.id].krp)+parseFloat(arr[e.id].vis)+parseFloat(arr[e.id].cleaning);
+            
+             for(let j=st_range;j<=end_range;j++){
+               if(j<=11){
+                if(!arr[e.id].payment[year_index][j][0]){
                amt+=total;
              }
+               }
            }
-           console.log(amt);
-           outstand.innerHTML+=`${amt}`;
+           
+           outstand.innerHTML=`total outstanding = ${amt}`;
              table.innerHTML = `
              <tr> 
                 <th>Name</th>"
@@ -116,19 +191,25 @@
               <td>${arr[e.id].krp}</td>   
               <td>${arr[e.id].vis}</td>   
               <td>${arr[e.id].cleaning}</td>   
-              <td>${total}</td>   
+              <td>${total}</td>    
              </tr>
              `;
-             console.log(arr[e.id]);
-         for(let i=0;i<date.getMonth()+1;i++){
+            //  console.log(arr[e.id]);
+           outstand.innerHTML=`<h3 class='outstanding'>Total outstanding =${amt}</h3>`;
+
+  
+
+         for(let i=st_range;i<=end_range&&i<=11;i++){
+           if(i==st_range)months.innerHTML='';
+          console.log(i);
            let date_db;
-              if(!arr[e.id].payment[i][0]){
+              if(!arr[e.id].payment[year_index][i][0]){
               total = parseFloat(arr[e.id].krp)+parseFloat(arr[e.id].vis)+parseFloat(arr[e.id].cleaning);
               date_db="not paid";
              }
              else{
                total = 0;
-               date_db = arr[e.id].payment[i][1];
+               date_db = arr[e.id].payment[year_index][i][1];
 
              }
                 months.innerHTML+= `
@@ -146,7 +227,7 @@
           <p>Paid on:</p><input value=${date_db} type='text' />  
           <h3>DUE: <input type="button" id=${i+15} class='pay-val' value=${total} /></h3> 
         <div class="card-action">
-            <button class="btn waves-effect waves-light submit-pay" type="submit" name="action">Paid
+            <button id=${i} class="btn waves-effect waves-light submit-pay" type="submit" name="action">Paid
   </button>
         </div>
       </div>
@@ -156,25 +237,27 @@
              }
 
              let pay_btn = document.querySelectorAll('.submit-pay');
-             pay_btn.forEach((x,i)=>{
-               x.addEventListener('click',()=>{
+             pay_btn.forEach((x1,i1)=>{
+               x1.addEventListener('click',()=>{
                  const data = arr[e.id];
-                 if(total>0){
-                  data.payment[i][0] = true;
-                data.payment[i].push(new Date());
                  console.log(data);
+                 if(total>0){
+                  data.payment[year_index][x1.id][0] = true;
+                data.payment[year_index][x1.id].push(new Date());
                 database.ref('User/'+data.id).update(data)
-                document.getElementById(`${i+15}`).value = 0;
-                outstand.innerHTML=`Outstanting amt = ${amt-total}`;
+               amt-= parseFloat(x1.parentElement.parentElement.children[6].children[0].value);
+               x1.parentElement.parentElement.children[6].children[0].value = 0;
+               outstand.innerHTML=`Outstanting amt = ${amt}`;
                  }
                })
              })
+             })
+           })
          })
      })
+    
     });
 })
-console.log(arr);
-  //  console.log(arr);
 </script>
 </body>
 </html>

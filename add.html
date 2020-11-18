@@ -31,24 +31,53 @@
 	<div class="limiter">
         <div class="container-login100" style="background-image: url('images/bg-01.jpg');">
 			<div class="wrap-login100">
-				<form id="login-form" class="login100-form validate-form">
+                <div class="" style='display: flex;justify-content: space-around;'>
+                    <a href="all.html" style="text-decoration: none;color: brown;font-size:30px;">View All</a>
+                <button id='signout' style="text-decoration: none;color: brown;font-size:30px;">Sign Out</button>
+                </div>
+				<form class="login100-form validate-form">
 					<span class="login100-form-logo">
 						<i class="zmdi zmdi-landscape"></i>
 					</span>
 
 					<span class="login100-form-title p-b-34 p-t-27">
-						Login
+						Add Entry
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Name Of Tennent">
-						<input id='login-email' class="input100 name" type="text" placeholder="name">
+						<input class="input100 name" type="text" placeholder="name">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter Floor">
-						<input id='login-pass' class="input100 floor" type="password" placeholder="floor">
+						<input class="input100 floor" type="text" placeholder="floor">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
+					<div class="wrap-input100 validate-input" data-validate="Enter Bank">
+						<input class="input100 bank" type="text" placeholder="Bank">
+						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate="Enter Deposit">
+						<input class="input100 deposit" type="text" placeholder="Deposit">
+						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate="Enter Lease Agreement">
+                        <input class="input100 from" type="date" placeholder="from">
+						<input class="input100 to" type="date" placeholder="to">
+                    </div>
+                    <div class="wrap-input100 validate-input" data-validate="KRP">
+						<input class="input100 krp" type="text" placeholder="KRP">
+						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+                    </div>
+                    <div class="wrap-input100 validate-input" data-validate="VIS">
+						<input class="input100 vis" type="text" placeholder="VIS">
+						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+					</div>
+                    <div class="wrap-input100 validate-input" data-validate="cleaning">
+						<input class="input100 clean" type="text" value="300" placeholder="cleaning">
+						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+					</div>
+					
 
 					<div class="container-login100-form-btn">
 						<button type="submit" class="login100-form-btn submit">
@@ -72,30 +101,22 @@
 <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
 <script src="./js/firebase.js"></script>
+<script src="./js/firebaseAdd.js"></script>
 <script src="./js/auth.js"></script>
-<script>
-	const loginForm = document.getElementById('login-form');
 
-	auth.onAuthStateChanged(user=>{
-		if(user){
-			window.location.assign("./add.html");
+<script>
+    const signout = document.getElementById('signout');
+    auth.onAuthStateChanged(user=>{
+		if(!user){
+			window.location.assign("./index.html");
 		}
 	})
-	//console.log(loginForm.children[3].children[0].value);
-	loginForm.addEventListener('submit',e=>{
-		e.preventDefault();
-		const email = loginForm['login-email'].value;
-		const pass = loginForm['login-pass'].value;
-		console.log(loginForm['login-pass']);
-		console.log(email);
-
-		auth.signInWithEmailAndPassword(email,pass).then(cred=>{
-			//console.log(cred.user);
-		})
-		// get user info
-
-	})
+    signout.addEventListener('click',e=>{
+        auth.signOut();
+        window.location.assign("./index.html");
+    })
 </script>
+
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -111,7 +132,7 @@
 <!--===============================================================================================-->
 	<script src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
-	<script src="js/main.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 </html>
